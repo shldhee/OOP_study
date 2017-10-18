@@ -191,6 +191,15 @@ Student.prototype.printStudentName = function() {
   console.log(this.studentName);
 }
 
+// Student.prototype = Object.create(School.prototype, {
+//   constructor: {
+//     configurable: true,
+//     enumerable: true,
+//     value: Student,
+//     writable: true
+//   }
+// });
+
 var s = new Student("수지", "이학교");
 s.printStudentName(); // 수지
 s.printSchoolName(); // 이학교
@@ -234,9 +243,165 @@ console.log(typeof s2);
 console.log(s1 == s2.valueOf());
 console.log((new String(s1)).length);
 ```
+* 원시값을 해당 생성자로 감싸고 객체는 필요할 때 원시값으로 처리하므로 오류는 발생하지 않는다.
 
 **ES6부터는 원시 타입에 해당 함수를 생성자로 호출하는 일이 금지된다. 즉, 원시 타입을 해당 객체로써 명시적으로 감사는 건 불가능**
 
-### 클래스 다루기
+## 클래스 다루기
 
-test
+> ES6 클래스는 생성자와 상속을 좀 더 간단하고 명확한 구문으로 다룰 수 있게 해준다.
+
+* 클래스 자신도 함수다.
+* 생성자 용도로 사용하지 않은 클래스는 필요가 없다.
+
+### 클래스 정의
+
+> 함수를 선언과 표현식, 두 가지 방법으로 정의하듯, 클래스에도 선언과 표현식, 두 가지 정의 방법이 있다.
+
+#### 클래스 선언
+
+``` js
+class Student {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+var s1 = new Student("수지");
+console.log(s1.name); // "수지"
+```
+
+1. `Student` 클래스를 생성
+2. 그 안에 `constructor` 메소드 정의
+3. 클래스의 새 인스턴스(`s1`), 즉 `name` 프로퍼티가 있는 객체를 생성
+
+* 클래스 바디는 중괄호 {} 안에 두고 여기에 메소드를 function 키워드 없이 정의
+* 메소드 사이에 콤마는 찍지 않는다.
+* 클래스는 함수로 취급, 내부적으로 클래스명은 함수명으로, `constructor` 메소드 바디는 함수 바디로 간주한다.
+
+**위 클래스 예제를 함수로 변경하면 다음과 같다.**
+
+``` js
+class Student {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+function School(name) {
+  this.name = name;
+}
+
+console.log(typeof Student); // function
+console.log(typeof Student == typeof School); // true
+```
+
+위 결과를 보면 **클래스는 함수라는 것**을 알 수 있다.
+
+### 클래스 표현식
+
+클래스 선언과 비슷하지만 클래스 명은 생략 가능하며, 클래스 바디와 로직 구현은 클래스 선언과 같다.
+
+``` js
+var Student = class {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+var s1 = new Student("수지");
+console.log(s1.name); // "수지"
+```
+
+위 클래스 선언문을 함수로 바꾸면 다음과 같다.
+
+``` js
+var Student = function(name) {
+  this.name = name;
+}
+
+var s1 = new Student("수지");
+console.log(s1.name); // "수지"
+```
+
+### 프로토타입 메소드
+
+> 클래스 바디 안에 있는 메소드는 모두 클래스의 `prototype` 프로퍼티에 추가된다.
+> 이 프로퍼트는 클래스로부터 생성한 객체들의 프로퍼티다.
+
+``` js
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  printProfile() {
+    console.log("이름: " + this.name + ", 나이: " + this.age);
+  }
+}
+
+var p = new Person("수지",12);
+p.printProfile();
+
+console.log("printProfile" in p.__proto__); // true 인스턴스의 __proto__ 는 Person.prototype
+console.log("printProfile" in Person.prototype); // true
+```
+
+위 클래스를 함수로 바꾸면 다음과 같다.
+
+``` js
+function Person(name, age) {
+  this.name = name;
+  this.age = age;
+}
+
+Person.prototype.printProfile = function() {
+  console.log("이름: " + this.name + ", 나이: " + this.age);
+}
+
+var p = new Person("수지",12);
+p.printProfile();
+
+console.log("printProfile" in p.__proto__); // true
+console.log("printProfile" in Person.prototype); // true
+```
+
+
+### get/set 메소드
+
+* ES5 이전에 접근자 프로퍼티를 객체에 추가하는 유일한 방법 `Object.definProperty()`뿐이지만
+* ES6부터는 메소드 앞에 `get, set`을 사용할 수 있다
+* 객체 리터럴 또는 클래스에 추가하여 접근자 프로퍼티의 `get/set`속성을 정의할 수 있다.
+
+``` js
+class Person {
+  constructor(name) {
+    this._name_ = name;
+  }
+
+  get name() {
+    return this._name_;
+  }
+
+  set name(name) {
+    this._name_ = name;
+  }
+}
+
+var p = new Person("수지");
+console.log(p.name); // "수지"
+p.name = "민호";
+console.log(p.name); // "민호"
+
+console.log("name" in p.__proto__); // true
+console.log("name" in Person.prototype); // true
+console.log(Object.getOwnPropertyDescriptor(p.__proto__, "name").set); // name(name) {  this._name_ = name; }
+console.log(Object.getOwnPropertyDescriptor(Person.prototype, "name").get); // name() { return this._name_; }
+console.log(Object.getOwnPropertyDescriptor(p, "_name_").value); // 민호
+```
+
+[https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptor](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptor)
+
+* 접근자 프로퍼티를 생성하여 `_name_` 프로퍼티를 캡슐화했다.( ?찾아보기 )
+* 콘솔 로그를 통해 `name`이 클래스의 `prototype` 프로퍼티에 추가된 접근자 프로퍼티임을 확인했다.
