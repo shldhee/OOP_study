@@ -54,8 +54,8 @@ class UnitGroup {
     let j = i.next();
 
     while(!j.done) {
-      console.log(j.value);
-      console.log(j.done);
+      // console.log(j.value);
+      // console.log(j.done);
       this.units.set(j.value.id, j);
       j = i.next();
     }
@@ -218,3 +218,8 @@ tester.testAddWeapon(unit, axe.weapon, axe.weapon); // 객체로 받는 부분..
 
 const group = new UnitGroup(unitList);
 group.getUnit(1000);
+
+// group.addUnit(unit)
+// group.removeUnit(unit or id)
+// group.getUnit(id)
+// group.getUnits()

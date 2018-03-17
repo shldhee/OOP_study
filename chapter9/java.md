@@ -400,3 +400,10 @@ ID  |테스트제목   |입력값   |예상출력값   |초기상태
 13  |그룹의 모든 유닛 가져오기   |N/A   |초기 리스트 같은 유닛의 리스트   |알려진 유닛 리스트를 가진 UnitGroup
 14  |유닛의 아이디로 유닛 삭제하기   |100   |유닛의 리스트(아이디가 100인 유닛이 없는)   |입력된 값이 없는 UnitGroup
 15  |유닛 인스턴스로 유닛제거하기   |100이란 아이디를 가진 유닛   |유닛의 리스트(아이디가 100인 유닛이 없는)   |입력된 값이 없는 UnitGroup
+
+``` js
+group.addUnit(unit)
+group.removeUnit(unit or id)
+group.getUnit(id)
+group.getUnits()
+```
